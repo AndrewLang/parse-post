@@ -39,7 +39,8 @@ function parseFile(fileName, channel) {
                         Content: item['content:encoded'][0],
                         DateCreated: item['wp:post_date'][0],
                         DatePublished: item['wp:post_date'][0],
-                        ReadCount:1
+                        ReadCount:1,
+                        Rating:1
                     };
 
                     var parser = new DOMParser();
