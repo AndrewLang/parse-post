@@ -30,7 +30,13 @@ function main() {
 function parseFile(fileName, channel) {
     return new Promise((resolve, reject) => {
         fs.readFile(__dirname + '/' + fileName, function (err, data) {
+            if (err)
+                console.log(err);
+
             parser(data, function (err, result) {
+                if (err)
+                    console.log(err);
+                    
                 var posts = [];
                 for (var item of result.rss.channel[0].item) {
 
@@ -39,8 +45,9 @@ function parseFile(fileName, channel) {
                         Content: item['content:encoded'][0],
                         DateCreated: item['wp:post_date'][0],
                         DatePublished: item['wp:post_date'][0],
-                        ReadCount:1,
-                        Rating:1
+
+                        ReadCount: 1,
+                        Rating: 1
                     };
 
                     var parser = new DOMParser();
@@ -52,12 +59,13 @@ function parseFile(fileName, channel) {
                             let image = localImages[0];
                             let src = image.getAttribute("src").toString();
                             if (src.startsWith('http')
-                                && src.indexOf('sinaimg') <0 ) {
+                                && src.indexOf('sinaimg') < 0) {
                                 post.SplashUrl = src;
                                 break;
                             }
                         }
                     }
+                    post.Slug = Slugify(item.title[0]);
                     post.ChannelId = channel;
                     posts.push(post);
                 }
@@ -104,6 +112,23 @@ function submitPost(post) {
             }
         });
     });
+}
+function Slugify(value) {
+    if (!value || value.length <= 0)
+        return value;
+
+    let slug = value.toString()
+        .toLowerCase()
+        .replace(/\s+/g, '-')           // Replace spaces with -
+        .replace(/[^\w\-]+/g, '')       // Remove all non-word chars
+        .replace(/\-\-+/g, '-')         // Replace multiple - with single -
+        .replace(/^-+/, '')             // Trim - from start of text
+        .replace(/-+$/, '');            // Trim - from end of text
+
+    if (!slug || slug.length <= 0)
+        slug = value;
+
+    return slug;
 }
 
 main();
